@@ -5,15 +5,18 @@ import { faBars } from '@fortawesome/free-solid-svg-icons';
 import MeetingRoomOutlinedIcon from '@mui/icons-material/MeetingRoomOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import { useMenuOpen } from '@/context/MenuOpen';
 
 export default function Header() {
+
+    const { setOpen } = useMenuOpen();
 
     function handleLogout() {
         console.log('logout')
     }
 
     function handleMenuToggle() {
-        console.log('toggle')
+        setOpen((prev) => !prev);
     }
 
     return (

@@ -3,9 +3,11 @@ import { usePage } from '@/context/Page';
 import { useRouter } from 'next/router';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import { useMenuOpen } from '@/context/MenuOpen';
 
 export function Layout({ children }) {
 
+    const { open } = useMenuOpen();
     const { page } = usePage();
     const router = useRouter();
 
@@ -18,8 +20,8 @@ export function Layout({ children }) {
     return (
         <div className='w-screen h-screen flex flex-col bg-gray-100'>
             <Header />
-            <main className='grow grid grid-cols-main'>
-                <Sidebar />
+            <main className={`grow grid ${open && "grid-cols-main"}`}>
+                {open && <Sidebar />}
                 <div className='grid grid-rows-content gap-5 px-10 py-5'>
                     <div className='flex flex-col'>
                         <h1 className='text-gray-600 text-page_title'>{page}</h1>
