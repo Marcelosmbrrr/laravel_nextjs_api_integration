@@ -31,13 +31,16 @@ class LoginController extends Controller
                 $permissions = ['users:read', 'roles:read'];
             }
 
-            $token = auth()->user()->createToken("auth-token", $permissions)->plainTextToken;
+            $timezone = new \DateTimeZone('America/Sao_Paulo');
+            $now = new \DateTime('now', $timezone);
+            $expiresAt = $now->add(new \DateInterval('PT1M'));
+            $token = auth()->user()->createToken("auth-token", $permissions, $expiresAt)->plainTextToken;
 
             // Notify
 
             return response()->json([
                 "user" => auth()->user(),
-                "auth-token" => $token,
+                "authtoken" => $token,
                 "message" => "Successful login!"
             ]);
         } catch (\Exception $e) {

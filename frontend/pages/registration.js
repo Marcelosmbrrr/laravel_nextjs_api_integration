@@ -99,11 +99,10 @@ export default function Registration() {
                     <div>
                         <div>
                             <input
-                                id="email-address"
-                                name="email"
-                                type="email"
+                                name="name"
+                                type="text"
                                 className={`relative block w-full appearance-none rounded border border-${formError.name.error ? "red" : "gray"}-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm`}
-                                placeholder="Email"
+                                placeholder="Full name"
                                 value={form.name}
                                 onChange={handleChange}
                             />
@@ -111,7 +110,6 @@ export default function Registration() {
                         </div>
                         <div className='mt-6'>
                             <input
-                                id="password"
                                 name="password"
                                 type="password"
                                 className={`relative block w-full appearance-none rounded border border-${formError.email.error ? "red" : "gray"}-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm`}
@@ -123,7 +121,6 @@ export default function Registration() {
                         </div>
                         <div className='mt-6'>
                             <input
-                                id="password"
                                 name="password"
                                 type="password"
                                 className={`relative block w-full appearance-none rounded border border-${formError.password.error ? "red" : "gray"}-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm`}
@@ -135,8 +132,7 @@ export default function Registration() {
                         </div>
                         <div className='mt-6'>
                             <input
-                                id="password"
-                                name="password"
+                                name="password_confirmation"
                                 type="password"
                                 className={`relative block w-full appearance-none rounded border border-${formError.password_confirmation.error ? "red" : "gray"}-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm`}
                                 placeholder="Password confirmation"
@@ -147,11 +143,7 @@ export default function Registration() {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-
-                        </div>
-
+                    <div className="flex items-center justify-start">
                         <div className="text-sm">
                             <Link href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
                                 Login

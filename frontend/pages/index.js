@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { env } from '@/next.config';
 import Link from 'next/link';
-import Cookies from 'js-cookie';
+import { parseCookies, setCookie, destroyCookie } from 'nookies'
 import { LockClosedIcon } from '@heroicons/react/20/solid';
 import axios from 'axios';
+import { useAuth } from '@/context/Auth';
 
 const initialForm = { email: "", password: "" };
 const initialFieldError = { error: false, message: "" };
@@ -15,6 +16,7 @@ const formValidation = {
 
 export default function Login() {
 
+  const { setUser } = useAuth();
   const [form, setForm] = React.useState(initialForm);
   const [formError, setFormError] = React.useState(initialFormError);
 
@@ -51,7 +53,14 @@ export default function Login() {
         data: JSON.stringify(form)
       });
 
-      console.log(response);
+      setUser(response.data.user);
+
+      setCookie(null, 'auth-token', response.data.authtoken, {
+        maxAge: 1
+      });
+
+      
+
 
     } catch (e) {
       console.log(e);
