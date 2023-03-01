@@ -9,14 +9,21 @@ export function Layout({ children }) {
     const { page } = usePage();
     const router = useRouter();
 
+    const subtitle = {
+        Dashboard: "/",
+        Users: "Dashboard / Users",
+        Roles: "Dashboard / Roles"
+    }
+
     return (
         <div className='w-screen h-screen flex flex-col bg-gray-100'>
             <Header />
             <main className='grow grid grid-cols-main'>
                 <Sidebar />
                 <div className='grid grid-rows-content gap-5 px-10 py-5'>
-                    <div>
+                    <div className='flex flex-col'>
                         <h1 className='text-gray-600 text-page_title'>{page}</h1>
+                        <span>{subtitle[page]}</span>
                     </div>
                     <div className='self-start h-full'>
                         {children}
