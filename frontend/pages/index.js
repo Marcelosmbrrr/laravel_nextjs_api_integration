@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { env } from '@/next.config';
+import Link from 'next/link';
 import Cookies from 'js-cookie';
 import { LockClosedIcon } from '@heroicons/react/20/solid';
 import axios from 'axios';
@@ -54,6 +55,21 @@ export default function Login() {
 
     } catch (e) {
       console.log(e);
+
+      if (e.response.status === 422) {
+
+        let validation = Object.assign({}, initialFormError);
+        let errors = e.response.data.errors;
+
+        for (let field in validation) {
+          if (errors.hasOwnProperty(field)) {
+            validation[field] = { error: true, message: errors[field][0] }
+          }
+        }
+
+        setFormError(validation);
+
+      }
     }
   }
 
@@ -108,7 +124,7 @@ export default function Login() {
                 id="password"
                 name="password"
                 type="password"
-                className={`relative block w-full appearance-none rounded border border-${formError.email.error ? "red" : "gray"}-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm`}
+                className={`relative block w-full appearance-none rounded border border-${formError.password.error ? "red" : "gray"}-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm`}
                 placeholder="Password"
                 value={form.password}
                 onChange={handleChange}
@@ -131,9 +147,9 @@ export default function Login() {
             </div>
 
             <div className="text-sm">
-              <a href="/registration" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <Link href="/registration" className="font-medium text-indigo-600 hover:text-indigo-500">
                 Registration
-              </a>
+              </Link>
             </div>
           </div>
 

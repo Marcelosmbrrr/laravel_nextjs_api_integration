@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { env } from '@/next.config';
+import Link from 'next/link';
 import axios from 'axios';
 
 const initialForm = { name: "", email: "", password: "", password_confirmation: "" };
@@ -45,6 +46,20 @@ export default function Registration() {
 
         } catch (e) {
             console.log(e);
+            if (e.response.code === 422) {
+
+                let validation = Object.assign({}, initialFormError);
+                let errors = e.response.data.errors;
+
+                for (let field in validation) {
+                    if (errors.hasOwnProperty(field)) {
+                        validation[field] = { error: true, message: errors[field][0] }
+                    }
+                }
+
+                setFormError(validation);
+
+            }
         }
     }
 
@@ -124,7 +139,7 @@ export default function Registration() {
                                 name="password"
                                 type="password"
                                 className={`relative block w-full appearance-none rounded border border-${formError.password_confirmation.error ? "red" : "gray"}-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm`}
-                                placeholder="Password"
+                                placeholder="Password confirmation"
                                 value={form.password_confirmation}
                                 onChange={handleChange}
                             />
@@ -138,9 +153,9 @@ export default function Registration() {
                         </div>
 
                         <div className="text-sm">
-                            <a href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
+                            <Link href="/" className="font-medium text-indigo-600 hover:text-indigo-500">
                                 Login
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
