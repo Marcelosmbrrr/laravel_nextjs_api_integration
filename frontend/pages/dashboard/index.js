@@ -1,8 +1,10 @@
 import * as React from 'react';
+import { parseCookies } from 'nookies';
 import { Layout } from '@/components/layout/Layout';
 import { usePage } from '@/context/Page';
+import { axios } from '@/services/api';
 
-export default function Dashboard({ props }) {
+export default function Dashboard(props) {
 
     const { setPage } = usePage();
 
@@ -39,8 +41,11 @@ export default function Dashboard({ props }) {
     )
 }
 
-export async function getStaticProps(context) {
-    console.log(context)
+export async function getServerSideProps(context) {
+    const { "auth-token": token } = parseCookies(context);
+    console.log('dashboard')
+    console.log(token)
+
     return {
         props: {}, // will be passed to the page component as props
     }

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { env } from '@/next.config';
 import Link from 'next/link';
-import axios from 'axios';
 import { useSnackbar } from 'notistack';
 import Router from 'next/router';
+import { axios } from '@/services/api';
 
 const initialForm = { name: "", email: "", password: "", password_confirmation: "" };
 const initialFieldError = { error: false, color: "gray", message: "" };

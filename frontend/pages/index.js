@@ -1,10 +1,7 @@
 import * as React from 'react';
-import { env } from '@/next.config';
 import Link from 'next/link';
 import Router from 'next/router';
-import { setCookie } from 'nookies'
 import { LockClosedIcon } from '@heroicons/react/20/solid';
-import axios from 'axios';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '@/context/Auth';
 
@@ -19,7 +16,7 @@ const formValidation = {
 export default function Login() {
 
   const { enqueueSnackbar } = useSnackbar();
-  const { setUser } = useAuth();
+  const { login } = useAuth();
 
   const [form, setForm] = React.useState(initialForm);
   const [formError, setFormError] = React.useState(initialFormError);
@@ -48,23 +45,13 @@ export default function Login() {
 
   async function fetchServer() {
     try {
-
-      const response = await axios.post(`${env.API_URL}/api/login`, JSON.stringify(form));
-
-      setUser(response.data.user);
-
-      setCookie(undefined, 'auth-token', response.data.authtoken, {
-        maxAge: 60
-      });
-
-      enqueueSnackbar(response.data.message, { variant: "success" });
-
-      Router.push("/dashboard");
-
+      await login(form);
     } catch (error) {
       console.log(error);
       setLoading(false);
-      handleErrorResponse(error.response);
+      if (error.response) {
+        handleErrorResponse(error.response);
+      }
     }
   }
 
