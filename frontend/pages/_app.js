@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-svg-core/styles.css'
 import { AuthProvider } from '@/context/Auth';
 import { PageProvider } from '@/context/Page';
 import { MenuOpenProvider } from '@/context/MenuOpen';
+import { SnackbarProvider } from 'notistack';
 
 config.autoAddCss = false;
 
@@ -12,7 +13,9 @@ export default function App({ Component, pageProps }) {
     <AuthProvider>
       <PageProvider>
         <MenuOpenProvider >
-          <Component {...pageProps} />
+          <SnackbarProvider maxSnack={3}>
+            <Component {...pageProps} />
+          </SnackbarProvider>
         </MenuOpenProvider>
       </PageProvider>
     </AuthProvider>

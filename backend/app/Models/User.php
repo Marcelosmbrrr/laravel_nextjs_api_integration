@@ -29,4 +29,14 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class, "role_id", "id");
     }
+
+    /**
+     * First name acessor.
+     *
+     * @return string
+     */
+    public function getFirstNameAttribute()
+    {
+        return explode(" ", $this->name)[0];
+    }
 }

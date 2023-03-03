@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Notifications\Auth\LoginNotification;
 
 class LoginController extends Controller
 {
@@ -19,7 +20,7 @@ class LoginController extends Controller
     public function __invoke(LoginRequest $request)
     {
         try {
-
+            
             if (!Auth::attempt($request->only(['email', 'password']))) {
                 throw new \Exception("Invalid credentials");
             }
@@ -34,15 +35,19 @@ class LoginController extends Controller
             $timezone = new \DateTimeZone('America/Sao_Paulo');
             $now = new \DateTime('now', $timezone);
             $expiresAt = $now->add(new \DateInterval('PT1M'));
+
             $token = auth()->user()->createToken("auth-token", $permissions, $expiresAt)->plainTextToken;
 
-            // Notify
+            $user = Auth::user();
 
-            return response()->json([
+            // Notify
+            $user->notify(new LoginNotification());
+
+            return response([
                 "user" => auth()->user(),
                 "authtoken" => $token,
                 "message" => "Successful login!"
-            ]);
+            ], 200);
         } catch (\Exception $e) {
             if ($e->getMessage() === "Invalid credentials") {
                 return response(["message" => $e->getMessage()], 404);

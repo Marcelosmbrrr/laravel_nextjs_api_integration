@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Layout } from '@/components/layout/Layout';
 import { usePage } from '@/context/Page';
 
-export default function Dashboard() {
+export default function Dashboard({ props }) {
 
     const { setPage } = usePage();
 
@@ -30,11 +30,18 @@ export default function Dashboard() {
                     <div className='rounded-lg bg-red-400' draggable onDrag={handleDragCard}>
                         D
                     </div>
-                </div> 
+                </div>
                 <div className='rounded-lg bg-green-200' draggable onDrag={handleDragCard}>
                     G
                 </div>
             </div>
         </Layout>
     )
+}
+
+export async function getStaticProps(context) {
+    console.log(context)
+    return {
+        props: {}, // will be passed to the page component as props
+    }
 }

@@ -4,12 +4,18 @@ import { useRouter } from 'next/router';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import { useMenuOpen } from '@/context/MenuOpen';
+import { useAuth } from '@/context/Auth';
 
-export function Layout({ children }) {
+export function Layout(props, { children }) {
 
+    const { verifyAuthentication } = useAuth();
     const { open } = useMenuOpen();
     const { page } = usePage();
     const router = useRouter();
+
+    React.useEffect(() => {
+        verifyAuthentication();
+    }, []);
 
     const subtitle = {
         Dashboard: "/",

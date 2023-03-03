@@ -1,7 +1,10 @@
 
 
 import * as React from 'react';
+import Router from 'next/router';
 import { env } from '@/next.config';
+import axios from 'axios';
+import { parseCookies } from 'nookies';
 
 export const AuthContext = React.createContext({});
 
@@ -12,28 +15,34 @@ export function AuthProvider({ children }) {
     // !! = short way to cast a variable to be a boolean
     const isAuthenticated = !!user;
 
-    // Check if user is authenticated and refresh user state
-    // This wil be call when user refreh the page
-    React.useEffect(() => {
+    async function verifyAuthentication() {
 
-        const token = localStorage.getItem('authtoken');
+        try {
 
-        const headers = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            const { 'auth-token': token } = parseCookies();
+
+            if (!token) {
+                throw new Error("Token expired!");
+                Router.push("/");
+            }
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+
+            const response = await axios.get(`${env.API_URL}/auth-data`, { headers });
+
+            setUser(response.data.user);
+
+        } catch (error) {
+            console.log(error);
+            Router.push("/");
         }
-
-        if (!!token) {
-            axios.get(`${env.API_URL}/auth-data`, { headers })
-                .then((response) => {
-                    setUser(response.data.user);
-                })
-        }
-
-    }, []);
+    }
 
     return (
-        <AuthContext.Provider value={{ user, setUser, isAuthenticated }}>
+        <AuthContext.Provider value={{ user, setUser, isAuthenticated, verifyAuthentication }}>
             {children}
         </AuthContext.Provider>
     )
