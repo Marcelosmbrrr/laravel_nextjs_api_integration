@@ -20,7 +20,7 @@ class LoginController extends Controller
     public function __invoke(LoginRequest $request)
     {
         try {
-            
+
             if (!Auth::attempt($request->only(['email', 'password']))) {
                 throw new \Exception("Invalid credentials");
             }

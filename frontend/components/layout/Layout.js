@@ -12,7 +12,7 @@ export function Layout(props) {
 
     const { ssProps, children } = props;
 
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, refreshData } = useAuth();
     const { open } = useMenuOpen();
     const { page } = usePage();
     const router = useRouter();
@@ -22,6 +22,10 @@ export function Layout(props) {
         Users: "Dashboard / Users",
         Roles: "Dashboard / Roles"
     }
+
+    React.useEffect(() => {
+        //refreshData();
+    }, []);
 
     if (isAuthenticated) {
         return (

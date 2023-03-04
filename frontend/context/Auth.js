@@ -1,11 +1,11 @@
 
 
 import * as React from 'react';
-import { setCookie } from 'nookies'
 import Router from 'next/router';
 import { env } from '@/next.config';
-import { parseCookies } from 'nookies';
+import { setCookie, parseCookies } from 'nookies'
 import { axios } from '@/services/api';
+import { TokenCSRFProvider } from '@/providers/TokenCSRFProvider';
 
 export const AuthContext = React.createContext({});
 
@@ -16,32 +16,51 @@ export function AuthProvider({ children }) {
     // !! = short way to cast a variable to be a boolean
     const isAuthenticated = !!user;
 
-    // When refresh page ...
-    React.useEffect(() => {
-        refreshData();
-    }, []);
+    async function refreshData() {
+        try {
 
-    function setAuthHeaders(authtoken, csrftoken) {
-        axios.defaults.headers.common["Authorization"] = `Bearer ${authtoken}`;
-        axios.defaults.headers.common["X-CSRF-TOKEN"] = csrftoken;
+            const provider = new TokenCSRFProvider();
+            const csrfToken = await provider.execute();
+
+            const { 'laranext.token': authtoken } = parseCookies();
+            if (!authtoken) {
+                throw new Error("Authentication Token expired!");
+            }
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken,
+                'Authorization': `Bearer ${authtoken}`
+            };
+
+            const response = await axios.get(`${env.API_URL}/auth-data`, headers);
+
+            setUser(response.data.user);
+
+            console.log("Data successful refresh!");
+        } catch (error) {
+            console.log(error);
+            Router.push("/");
+        }
     }
 
-    // When login ...
+    // When doing login ...
     async function login(form) {
         try {
 
-            // Get Token CSRF
-            // https://laravel.com/docs/9.x/sanctum#csrf-protection
-            const response_csrf = await axios.get(`${env.API_URL}/sanctum/csrf-cookie`);
+            const provider = new TokenCSRFProvider();
+            const csrfToken = await provider.execute();
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            };
 
             // Do Login
-            const response_login = await axios.post(`${env.API_URL}/api/login`, {
+            const response = await axios.post(`${env.API_URL}/api/login`, {
                 email: form.email,
                 password: form.password
-            });
-
-            const authtoken = response_login.data.authtoken;
-            const csrftoken = response_csrf.data.csrftoken;
+            }, headers);
 
             setUser(response.data.user);
 
@@ -50,7 +69,7 @@ export function AuthProvider({ children }) {
                 maxAge: 120, // seconds
             });
 
-            setAuthHeaders(authtoken, csrftoken);
+            axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.authtoken}`;
 
             Router.push("/dashboard");
 
@@ -60,52 +79,39 @@ export function AuthProvider({ children }) {
         }
     }
 
-    // When logout ...
+    // When doing logout ...
     async function logout() {
         try {
 
-
-
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    // To refresh sanctum and CSRF ...
-    async function renewTokens() {
-        try {
-            //
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    async function refreshData() {
-
-        try {
+            const provider = new TokenCSRFProvider();
+            const csrfToken = await provider.execute();
 
             const { 'laranext.token': authtoken } = parseCookies();
-            const { 'XSRF-TOKEN': csrftoken } = parseCookies();
 
             if (!authtoken) {
-                throw new Error("Token expired!");
-                Router.push("/");
+                throw new Error("Authentication Token expired!");
             }
 
-            setAuthHeaders(authtoken, csrftoken);
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken,
+                'Authorization': `Bearer ${authtoken}`
+            };
 
-            const response = await axios.get(`${env.API_URL}/auth-data`);
+            await axios.post(`${env.API_URL}/api/logout`, {}, headers);
 
-            setUser(response.data.user);
+            destroyCookie(null, 'laranext.token');
 
-        } catch (error) {
-            console.log(error);
+            Router.push("/");
+
+        } catch (e) {
+            console.log(e)
             Router.push("/");
         }
     }
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, login, logout, refreshData }}>
             {children}
         </AuthContext.Provider>
     )

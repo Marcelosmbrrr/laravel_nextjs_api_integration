@@ -1,9 +1,9 @@
 import * as React from 'react';
 import Link from 'next/link';
-import Router from 'next/router';
 import { LockClosedIcon } from '@heroicons/react/20/solid';
-import { useSnackbar } from 'notistack';
 import { useAuth } from '@/context/Auth';
+import { useSnackbar } from 'notistack';
+import { TokenCSRFProvider } from '@/providers/TokenCSRFProvider';
 
 const initialForm = { email: "", password: "" };
 const initialFieldError = { error: false, color: "gray", message: "" };
@@ -46,6 +46,7 @@ export default function Login() {
   async function fetchServer() {
     try {
       await login(form);
+      enqueueSnackbar("Successful login!", { variant: "success" });
     } catch (error) {
       console.log(error);
       setLoading(false);

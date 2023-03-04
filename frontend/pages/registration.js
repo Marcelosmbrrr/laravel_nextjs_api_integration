@@ -1,9 +1,11 @@
 import * as React from 'react';
+import Router from 'next/router';
 import { env } from '@/next.config';
 import Link from 'next/link';
+import { useAuth } from '@/context/Auth';
 import { useSnackbar } from 'notistack';
-import Router from 'next/router';
 import { axios } from '@/services/api';
+import { TokenCSRFProvider } from '@/providers/TokenCSRFProvider';
 
 const initialForm = { name: "", email: "", password: "", password_confirmation: "" };
 const initialFieldError = { error: false, color: "gray", message: "" };
@@ -47,23 +49,33 @@ export default function Registration() {
     async function fetchServer() {
         try {
 
+            const provider = new TokenCSRFProvider();
+            const csrfToken = await provider.execute();
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            };
+
             const response = await axios.post(`${env.API_URL}/api/registration`, {
                 name: form.name,
                 email: form.email,
                 password: form.password,
                 password_confirmation: form.password_confirmation
-            });
+            }, headers);
 
             enqueueSnackbar(response.data.message, { variant: "success" });
 
             setTimeout(() => {
                 Router.push("/");
-            }, 2000);
+            }, 100);
 
         } catch (error) {
             console.log(error);
             setLoading(false);
-            handleErrorResponse(error.response);
+            if (error.response) {
+                handleErrorResponse(error.response);
+            }
         }
     }
 

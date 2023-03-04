@@ -20,6 +20,8 @@ class RegistrationController extends Controller
     public function __invoke(RegistrationRequest $request)
     {
         try {
+
+            dd("ok");
             
             $user = $this->model->create([
                 "name" => $request->name,

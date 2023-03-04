@@ -1,18 +1,23 @@
 import * as React from 'react';
-import axios from 'axios';
+import Router from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import MeetingRoomOutlinedIcon from '@mui/icons-material/MeetingRoomOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import { useMenuOpen } from '@/context/MenuOpen';
+import { useAuth } from '@/context/Auth';
+import { useSnackbar } from 'notistack';
 
 export default function Header() {
 
+    const { enqueueSnackbar } = useSnackbar();
+    const { logout } = useAuth();
     const { setOpen } = useMenuOpen();
 
-    function handleLogout() {
-        console.log('logout')
+    async function handleLogout() {
+        await logout();
+        enqueueSnackbar("Your session was finished!", { variant: "success" });
     }
 
     function handleMenuToggle() {
