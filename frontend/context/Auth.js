@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Router from 'next/router';
 import { env } from '@/next.config';
-import { setCookie, parseCookies } from 'nookies'
+import { parseCookies, setCookie } from 'nookies'
 import { axios } from '@/services/api';
 import { TokenCSRFProvider } from '@/providers/TokenCSRFProvider';
 
@@ -16,33 +16,41 @@ export function AuthProvider({ children }) {
     // !! = short way to cast a variable to be a boolean
     const isAuthenticated = !!user;
 
-    async function refreshData() {
-        try {
+    React.useEffect(() => {
 
-            const provider = new TokenCSRFProvider();
-            const csrfToken = await provider.execute();
+        const exec = async () => {
+            try {
 
-            const { 'laranext.token': authtoken } = parseCookies();
-            if (!authtoken) {
-                throw new Error("Authentication Token expired!");
+                const { 'XSRF-TOKEN': csrfToken } = parseCookies();
+                if (!csrfToken) {
+                    throw new Error("Session Token expired!");
+                }
+
+                const { 'next.auth': authtoken } = parseCookies();
+                if (!authtoken) {
+                    throw new Error("Authentication Token expired!");
+                }
+
+                const headers = {
+                    'X-CSRF-Token': csrfToken,
+                    'Authorization': `Bearer ${authtoken}`
+                };
+
+                const response = await axios.get(`${env.API_URL}/api/auth-data`, { headers });
+
+                setUser(response.data.user);
+
+            } catch (error) {
+                console.log(error);
+                Router.push("/");
             }
-
-            const headers = {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': csrfToken,
-                'Authorization': `Bearer ${authtoken}`
-            };
-
-            const response = await axios.get(`${env.API_URL}/auth-data`, headers);
-
-            setUser(response.data.user);
-
-            console.log("Data successful refresh!");
-        } catch (error) {
-            console.log(error);
-            Router.push("/");
         }
-    }
+
+        if (/^\/dashboard/.test(Router.pathname)) {
+            exec();
+        }
+
+    }, []);
 
     // When doing login ...
     async function login(form) {
@@ -65,7 +73,7 @@ export function AuthProvider({ children }) {
             setUser(response.data.user);
 
             // Params: ctx (server side) or undefined (client side), name, data, time (seconds), route that can access the cookie
-            setCookie(undefined, 'laranext.token', response.data.authtoken, {
+            setCookie(null, 'next.auth', response.data.authtoken, {
                 maxAge: 120, // seconds
             });
 
@@ -83,11 +91,12 @@ export function AuthProvider({ children }) {
     async function logout() {
         try {
 
-            const provider = new TokenCSRFProvider();
-            const csrfToken = await provider.execute();
+            const { 'XSRF-TOKEN': csrfToken } = parseCookies();
+            if (!csrfToken) {
+                throw new Error("Session Token expired!");
+            }
 
-            const { 'laranext.token': authtoken } = parseCookies();
-
+            const { 'next.auth': authtoken } = parseCookies();
             if (!authtoken) {
                 throw new Error("Authentication Token expired!");
             }
@@ -98,20 +107,19 @@ export function AuthProvider({ children }) {
                 'Authorization': `Bearer ${authtoken}`
             };
 
-            await axios.post(`${env.API_URL}/api/logout`, {}, headers);
+            await axios.post(`${env.API_URL}/api/logout`, {}, { headers });
 
-            destroyCookie(null, 'laranext.token');
-
-            Router.push("/");
+            destroyCookie(null, 'next.auth');
 
         } catch (e) {
             console.log(e)
+        } finally {
             Router.push("/");
         }
     }
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated, login, logout, refreshData }}>
+        <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
             {children}
         </AuthContext.Provider>
     )

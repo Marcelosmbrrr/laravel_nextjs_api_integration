@@ -36,7 +36,7 @@ class LoginController extends Controller
             $now = new \DateTime('now', $timezone);
             $expiresAt = $now->add(new \DateInterval('PT1M'));
 
-            $token = auth()->user()->createToken("auth-token", $permissions, $expiresAt)->plainTextToken;
+            $token = auth()->user()->createToken("next.auth", $permissions, $expiresAt)->plainTextToken;
 
             $user = Auth::user();
 

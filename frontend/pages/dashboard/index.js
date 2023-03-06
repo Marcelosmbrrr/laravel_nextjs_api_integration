@@ -1,6 +1,6 @@
 import * as React from 'react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { parseCookies } from 'nookies';
-import { Layout } from '@/components/layout/Layout';
 import { usePage } from '@/context/Page';
 import { axios } from '@/services/api';
 
@@ -17,7 +17,7 @@ export default function Dashboard(props) {
     }
 
     return (
-        <Layout>
+        <DashboardLayout>
             <div className='w-full h-full grid grid-rows-dashboard gap-2'>
                 <div className='grid grid-cols-none grid-rows-4 sm:grid-cols-2 sm:grid-rows-2 lg:grid-cols-4 lg:grid-rows-none gap-5'>
                     <div className='rounded-lg bg-red-200' draggable onDrag={handleDragCard}>
@@ -37,12 +37,12 @@ export default function Dashboard(props) {
                     G
                 </div>
             </div>
-        </Layout>
+        </DashboardLayout>
     )
 }
 
 export async function getServerSideProps(context) {
-    const { "auth-token": token } = parseCookies(context);
+    const { "next.auth": token } = parseCookies(context);
     console.log('dashboard')
     console.log(token)
 

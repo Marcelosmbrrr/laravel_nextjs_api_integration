@@ -3,16 +3,16 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { usePage } from '@/context/Page';
 import { useRouter } from 'next/router';
+import { useAuth } from '@/context/Auth';
+import { useMenuOpen } from '@/context/MenuOpen';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import { useMenuOpen } from '@/context/MenuOpen';
-import { useAuth } from '@/context/Auth';
 
-export function Layout(props) {
+export function DashboardLayout(props) {
 
     const { ssProps, children } = props;
 
-    const { isAuthenticated, refreshData } = useAuth();
+    const { isAuthenticated, refreshData, user } = useAuth();
     const { open } = useMenuOpen();
     const { page } = usePage();
     const router = useRouter();
@@ -22,10 +22,6 @@ export function Layout(props) {
         Users: "Dashboard / Users",
         Roles: "Dashboard / Roles"
     }
-
-    React.useEffect(() => {
-        //refreshData();
-    }, []);
 
     if (isAuthenticated) {
         return (
@@ -50,7 +46,6 @@ export function Layout(props) {
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                 open={open}
-                onClick={handleClose}
             >
                 <CircularProgress color="inherit" />
             </Backdrop>
