@@ -2,6 +2,7 @@ import * as React from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { parseCookies } from 'nookies';
 import { usePage } from '@/context/Page';
+import { AreaChart } from '@/components/charts/AreaChart';
 import { axios } from '@/services/api';
 
 export default function Dashboard(props) {
@@ -21,16 +22,16 @@ export default function Dashboard(props) {
             <div className='w-full h-full grid grid-cols-none gap-2 grid-rows-min_dash sm:grid-rows-sm_dash md:grid-rows-md_dash lg:grid-rows-lg_dash'>
                 <div className='grid grid-cols-none grid-rows-4 gap-2 sm:grid-rows-sm_dash_cards sm:grid-cols-2 md:grid-rows-md_dash_cards md:grid-cols-2 lg:grid-cols-4 lg:grid-rows-lg_dash_cards'>
                     <div className='rounded-lg shadow-card max-h-48' draggable onDrag={handleDragCard}>
-                        A
+                        <AreaChart />
                     </div>
                     <div className='rounded-lg shadow-card max-h-48' draggable onDrag={handleDragCard}>
-                        B
+                        <AreaChart />
                     </div>
                     <div className='rounded-lg shadow-card max-h-48' draggable onDrag={handleDragCard}>
-                        C
+                        <AreaChart />
                     </div>
                     <div className='rounded-lg shadow-card max-h-48' draggable onDrag={handleDragCard}>
-                        D
+                        <AreaChart />
                     </div>
                 </div>
                 <div className='rounded-lg shadow-card min-h-fit' draggable onDrag={handleDragCard}>

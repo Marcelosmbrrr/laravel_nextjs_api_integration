@@ -26,7 +26,8 @@ module.exports = {
       },
       gridTemplateColumns: {
         "header": "repeat(2, min-content) 1fr",
-        "main": "130px 1fr"
+        "main": "130px 1fr",
+        "table_head": "repeat(3, max-content) 1fr"
       },
       gridTemplateRows: {
         "sidebar_items": "repeat(3, 105px) 1fr",

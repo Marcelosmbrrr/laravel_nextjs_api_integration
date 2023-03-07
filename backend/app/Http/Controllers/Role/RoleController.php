@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Role;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Role;
 
 class RoleController extends Controller
 {
@@ -12,7 +13,22 @@ class RoleController extends Controller
      */
     public function index()
     {
-        //
+        try {
+
+            $roles = Role::all();
+
+            if (!$roles) {
+                throw new \Exception("404");
+            }
+
+            return response(["message" => "", "roles" => $roles]);
+        } catch (\Exception $e) {
+            if ($e->getMessage() === "404") {
+                return response(["message" => "No roles founded", "roles" => []], 404);
+            } else {
+                return response(["message" => $e->getMessage(), "roles" => []], 500);
+            }
+        }
     }
 
     /**
