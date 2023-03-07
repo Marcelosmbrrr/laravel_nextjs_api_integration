@@ -140,6 +140,8 @@ export async function getServerSideProps(context) {
 
         const response = await axios.get(`${env.API_URL}/api/user`, { headers });
 
+        console.log(response)
+
         props.users = response.data.users;
         props.message = response.data.message;
 
@@ -149,7 +151,7 @@ export async function getServerSideProps(context) {
         if (e.response) {
             props.message = e.response.data.message;
         } else {
-            props.message = "Server error";
+            props.message = e.message;
         }
 
     }

@@ -123,7 +123,7 @@ export default function Roles(props) {
 export async function getServerSideProps(context) {
 
     let props = {
-        roles: [],
+        users: [],
         error: false,
         message: ""
     }
@@ -149,12 +149,11 @@ export async function getServerSideProps(context) {
         if (e.response) {
             props.message = e.response.data.message;
         } else {
-            props.message = "Server error";
+            props.message = e.message;
         }
 
     }
 
-    // Will be passed to the page component as props
     return {
         props: props,
     }

@@ -15,7 +15,7 @@ class RoleController extends Controller
     {
         try {
 
-            $roles = Role::all();
+            $roles = Role::with("users")->get();
 
             if (!$roles) {
                 throw new \Exception("404");
@@ -58,7 +58,7 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
         //
     }

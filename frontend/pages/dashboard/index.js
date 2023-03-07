@@ -45,9 +45,8 @@ export default function Dashboard(props) {
 // https://nextjs.org/docs/basic-features/data-fetching/get-static-props
 // https://nextjs.org/docs/basic-features/data-fetching/incremental-static-regeneration
 export async function getStaticProps(context) {
-    const { "next.auth": token } = parseCookies(context);
-    console.log('dashboard')
-    console.log(token)
+    const { "next.auth": authtoken } = parseCookies(context);
+    console.log('dashboard');
 
     return {
         props: {},
