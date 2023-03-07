@@ -24,7 +24,7 @@ export default function Header() {
     }
 
     return (
-        <header className='flex justify-center w-full basis-20 bg-white shadow-md'>
+        <header className='w-full basis-20 flex justify-center  bg-white shadow-md'>
             <div className='grid grid-cols-header grid-rows-none w-header h-full gap-3 justify-items-center items-center'>
                 <div>
                     <FontAwesomeIcon icon={faBars} size="xl" color='#4B5563' className='hover:text-red-400 cursor-pointer' onClick={handleMenuToggle} />

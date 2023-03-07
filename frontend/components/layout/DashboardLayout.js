@@ -25,7 +25,7 @@ export function DashboardLayout(props) {
 
     if (isAuthenticated) {
         return (
-            <div className='w-screen h-screen flex flex-col bg-gray-100'>
+            <div className='flex flex-col h-screen'>
                 <Header />
                 <main className={`grow grid ${open && "grid-cols-main"}`}>
                     {open && <Sidebar />}
@@ -38,6 +38,7 @@ export function DashboardLayout(props) {
                             {children}
                         </div>
                     </div>
+                    
                 </main>
             </div>
         )
