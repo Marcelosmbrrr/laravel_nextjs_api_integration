@@ -6,7 +6,6 @@ import { CreateUser } from '@/components/formulary/user/CreateUser';
 import { UpdateUser } from '@/components/formulary/user/UpdateUser';
 import { DeleteUser } from '@/components/formulary/user/DeleteUser';
 import IconButton from '@mui/material/IconButton';
-import CreateIcon from '@mui/icons-material/Create';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useSnackbar } from 'notistack';
 import { usePage } from '@/context/Page';
@@ -32,7 +31,7 @@ export default function Users(props) {
                 <tr className="bg-white border-b dark:border-gray-100 hover:bg-gray-50" key={record.id}>
                     <td className="w-4 p-4">
                         <div className="flex items-center">
-                            <input id="checkbox-table-search-1" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                            <input id="checkbox-table-search-1" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" onClick={(e) => handleSelect(e, "one", index)} />
                         </div>
                     </td>
                     <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -58,7 +57,7 @@ export default function Users(props) {
         }
     }
 
-    function handleSelect(e, type = "one", index) {
+    function handleSelect(e, type, index) {
         console.log(type);
     }
 
@@ -131,8 +130,15 @@ export async function getServerSideProps(context) {
 
     try {
 
-        const { "next.auth": token } = parseCookies(context);
-        const response = await axios.get(`${env.API_URL}/api/users`);
+        const { "next.auth": authtoken } = parseCookies(context);
+        const { 'XSRF-TOKEN': csrfToken } = parseCookies(context);
+
+        const headers = {
+            'X-CSRF-Token': csrfToken,
+            'Authorization': `Bearer ${authtoken}`
+        };
+
+        const response = await axios.get(`${env.API_URL}/api/user`, { headers });
 
         props.users = response.data.users;
         props.message = response.data.message;
