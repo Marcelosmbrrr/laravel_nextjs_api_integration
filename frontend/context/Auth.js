@@ -73,11 +73,9 @@ export function AuthProvider({ children }) {
             setUser(response.data.user);
 
             // Params: ctx (server side) or undefined (client side), name, data, time (seconds), route that can access the cookie
-            setCookie(null, 'next.auth', response.data.authtoken, {
+            setCookie(undefined, 'next.auth', response.data.authtoken, {
                 maxAge: 120, // seconds
             });
-
-            axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.authtoken}`;
 
             Router.push("/dashboard");
 

@@ -123,25 +123,31 @@ export default function Roles(props) {
 export async function getServerSideProps(context) {
 
     let props = {
-        users: [],
+        roles: [],
         error: false,
         message: ""
     }
 
     try {
 
-        const { "next.auth": authtoken } = parseCookies(context);
-        const { 'XSRF-TOKEN': csrfToken } = parseCookies(context);
+        const { 'XSRF-TOKEN': csrftoken } = parseCookies(context);
+        if (!csrftoken) {
+            throw new Error("Session Token expired!");
+        }
 
-        const headers = {
-            'X-CSRF-Token': csrfToken,
-            'Authorization': `Bearer ${authtoken}`
-        };
+        const { 'next.auth': authtoken } = parseCookies(context);
+        if (!authtoken) {
+            throw new Error("Authentication Token expired!");
+        }
 
+        console.log(headers)
+
+        /*
         const response = await axios.get(`${env.API_URL}/api/role`, { headers });
 
         props.roles = response.data.roles;
         props.message = response.data.message;
+        */
 
     } catch (e) {
         console.log(e);

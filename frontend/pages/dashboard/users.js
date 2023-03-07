@@ -21,6 +21,7 @@ export default function Users(props) {
     React.useEffect(() => {
         setPage("Users");
         enqueueSnackbar(props.message, { variant: props.error ? "error" : "success" });
+
     }, []);
 
     function renderTableRows() {
@@ -130,20 +131,30 @@ export async function getServerSideProps(context) {
 
     try {
 
-        const { "next.auth": authtoken } = parseCookies(context);
-        const { 'XSRF-TOKEN': csrfToken } = parseCookies(context);
+        const { 'XSRF-TOKEN': csrftoken } = parseCookies(context);
+        if (!csrftoken) {
+            throw new Error("Session Token expired!");
+        }
+
+        const { 'next.auth': authtoken } = parseCookies(context);
+        if (!authtoken) {
+            throw new Error("Authentication Token expired!");
+        }
 
         const headers = {
-            'X-CSRF-Token': csrfToken,
+            'X-CSRF-Token': csrftoken,
             'Authorization': `Bearer ${authtoken}`
         };
 
-        const response = await axios.get(`${env.API_URL}/api/user`, { headers });
+        console.log(headers)
 
-        console.log(response)
+        /*
+        const response = await axios.get(`${env.API_URL}/api/user`, { headers });
 
         props.users = response.data.users;
         props.message = response.data.message;
+        */
+
 
     } catch (e) {
         console.log(e);
