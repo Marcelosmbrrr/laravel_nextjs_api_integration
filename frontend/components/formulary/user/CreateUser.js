@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { env } from '@/next.config';
 import Grid from '@mui/material/Grid';
 import { Divider } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
@@ -10,10 +11,12 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { axios } from '../../../services/api';
+import { LoadedDataSelection } from '@/components/select/LoadedDataSelection';
 
 const initialForm = { name: "", email: "", role: "0" };
 
-export function CreateUser() {
+export function CreateUser(props) {
 
     const [open, setOpen] = React.useState(false);
     const [form, setForm] = React.useState(initialForm);
@@ -36,7 +39,7 @@ export function CreateUser() {
 
     return (
         <div>
-            <IconButton onClick={handleClickOpen}>
+            <IconButton onClick={handleClickOpen} disabled={props.disabled}>
                 <AddIcon />
             </IconButton>
             <Dialog
@@ -77,6 +80,18 @@ export function CreateUser() {
                                 fullWidth
                                 variant="outlined"
                                 onChange={handleChange}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <LoadedDataSelection
+                                fetch_from={`${env.API_URL}/api/action/get-roles`}
+                                selected={"0"}
+                                key_name={"name"}
+                                key_value={"id"}
+                                name={"role"}
+                                setForm={setForm}
+                                label={"Role"}
                             />
                         </Grid>
                     </Grid>

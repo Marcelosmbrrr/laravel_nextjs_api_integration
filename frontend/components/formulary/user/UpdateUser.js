@@ -36,7 +36,7 @@ export function UpdateUser(props) {
 
     return (
         <div>
-            <IconButton onClick={handleClickOpen}>
+            <IconButton onClick={handleClickOpen} disabled={props.disabled}>
                 <CreateIcon />
             </IconButton>
             <Dialog

@@ -27,7 +27,7 @@ export function DeleteUser(props) {
 
     return (
         <div>
-            <IconButton onClick={handleClickOpen}>
+            <IconButton onClick={handleClickOpen} disabled={props.disabled}>
                 <DeleteIcon />
             </IconButton>
             <Dialog

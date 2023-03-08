@@ -1,15 +1,15 @@
 import * as React from 'react';
+import IconButton from '@mui/material/IconButton';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { useSnackbar } from 'notistack';
 import Router from 'next/router';
 import { env } from '@/next.config';
+import nookies from 'nookies';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { CreateUser } from '@/components/formulary/user/CreateUser';
 import { UpdateUser } from '@/components/formulary/user/UpdateUser';
 import { DeleteUser } from '@/components/formulary/user/DeleteUser';
-import IconButton from '@mui/material/IconButton';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import { useSnackbar } from 'notistack';
 import { usePage } from '@/context/Page';
-import { parseCookies } from 'nookies';
 import { axios } from "../../services/api";
 
 export default function Users(props) {
@@ -59,7 +59,7 @@ export default function Users(props) {
     }
 
     function handleSelect(e, type, index) {
-        console.log(type);
+        console.log('select');
     }
 
     return (
@@ -68,13 +68,13 @@ export default function Users(props) {
                 <div className="w-full h-full flex flex-col">
                     <div className="basis-10 grid grid-rows-none grid-cols-table_head">
                         <div>
-                            <CreateUser />
+                            <CreateUser disabled={selections.length > 0} />
                         </div>
                         <div>
-                            <UpdateUser />
+                            <UpdateUser disabled={selections.length > 1 || selections.length === 0} />
                         </div>
                         <div>
-                            <DeleteUser />
+                            <DeleteUser disabled={selections.length === 0} />
                         </div>
                         <div onClick={() => Router.replace(Router.asPath)}>
                             <IconButton>
@@ -91,7 +91,7 @@ export default function Users(props) {
                                         <tr>
                                             <th scope="col" className="p-4">
                                                 <div className="flex items-center">
-                                                    <input id="checkbox-all-search" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2" onClick={(e) => handleSelect(e, "all", index)} />
+                                                    <input id="checkbox-all-search" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2" onClick={(e) => handleSelect(e, "all", null)} />
                                                 </div>
                                             </th>
                                             <th scope="col" className="px-6 py-3">
@@ -131,30 +131,29 @@ export async function getServerSideProps(context) {
 
     try {
 
-        const { 'XSRF-TOKEN': csrftoken } = parseCookies(context);
-        if (!csrftoken) {
+        const cookies = nookies.get(context);
+
+        if (!cookies["XSRF-TOKEN"]) {
             throw new Error("Session Token expired!");
         }
 
-        const { 'next.auth': authtoken } = parseCookies(context);
-        if (!authtoken) {
+        if (!cookies["next.auth"]) {
             throw new Error("Authentication Token expired!");
         }
 
         const headers = {
-            'X-CSRF-Token': csrftoken,
-            'Authorization': `Bearer ${authtoken}`
+            'X-CSRF-Token': cookies["XSRF-TOKEN"],
+            'Authorization': `Bearer ${cookies["next.auth"]}`
         };
 
-        console.log(headers)
-
-        /*
-        const response = await axios.get(`${env.API_URL}/api/user`, { headers });
+        const response = await axios.get(`${env.API_URL}/api/user`, headers);
 
         props.users = response.data.users;
         props.message = response.data.message;
-        */
 
+        return {
+            props: props,
+        }
 
     } catch (e) {
         console.log(e);
@@ -165,11 +164,12 @@ export async function getServerSideProps(context) {
             props.message = e.message;
         }
 
+        return {
+            props: props,
+        }
+
     }
 
-    // Will be passed to the page component as props
-    return {
-        props: props,
-    }
+
 
 }

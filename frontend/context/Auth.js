@@ -1,9 +1,9 @@
 
 
 import * as React from 'react';
+import { parseCookies, setCookie, destroyCookie } from 'nookies'
 import Router from 'next/router';
 import { env } from '@/next.config';
-import { parseCookies, setCookie } from 'nookies'
 import { axios } from '@/services/api';
 import { TokenCSRFProvider } from '@/providers/TokenCSRFProvider';
 
@@ -21,22 +21,22 @@ export function AuthProvider({ children }) {
         const exec = async () => {
             try {
 
-                const { 'XSRF-TOKEN': csrfToken } = parseCookies();
-                if (!csrfToken) {
+                const cookies = parseCookies();
+
+                if (!cookies["XSRF-TOKEN"]) {
                     throw new Error("Session Token expired!");
                 }
 
-                const { 'next.auth': authtoken } = parseCookies();
-                if (!authtoken) {
+                if (!cookies["next.auth"]) {
                     throw new Error("Authentication Token expired!");
                 }
 
                 const headers = {
-                    'X-CSRF-Token': csrfToken,
-                    'Authorization': `Bearer ${authtoken}`
+                    'X-CSRF-Token': cookies["XSRF-TOKEN"],
+                    'Authorization': `Bearer ${cookies["next.auth"]}`
                 };
 
-                const response = await axios.get(`${env.API_URL}/api/auth-data`, { headers });
+                const response = await axios.get(`${env.API_URL}/api/auth-data`, headers);
 
                 setUser(response.data.user);
 
@@ -73,7 +73,7 @@ export function AuthProvider({ children }) {
             setUser(response.data.user);
 
             // Params: ctx (server side) or undefined (client side), name, data, time (seconds), route that can access the cookie
-            setCookie(undefined, 'next.auth', response.data.authtoken, {
+            setCookie(null, 'next.auth', response.data.authtoken, {
                 maxAge: 120, // seconds
             });
 
@@ -89,23 +89,22 @@ export function AuthProvider({ children }) {
     async function logout() {
         try {
 
-            const { 'XSRF-TOKEN': csrfToken } = parseCookies();
-            if (!csrfToken) {
+            const cookies = parseCookies();
+
+            if (!cookies["XSRF-TOKEN"]) {
                 throw new Error("Session Token expired!");
             }
 
-            const { 'next.auth': authtoken } = parseCookies();
-            if (!authtoken) {
+            if (!cookies["next.auth"]) {
                 throw new Error("Authentication Token expired!");
             }
 
             const headers = {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': csrfToken,
-                'Authorization': `Bearer ${authtoken}`
+                'X-CSRF-Token': cookies["XSRF-TOKEN"],
+                'Authorization': `Bearer ${cookies["next.auth"]}`
             };
 
-            await axios.post(`${env.API_URL}/api/logout`, {}, { headers });
+            await axios.post(`${env.API_URL}/api/logout`, {}, headers);
 
             destroyCookie(null, 'next.auth');
 

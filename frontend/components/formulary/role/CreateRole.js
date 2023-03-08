@@ -10,10 +10,11 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { ProvidedDataSelection } from '@/components/select/ProvidedDataSelection';
 
 const initialForm = { name: "", access: "0" };
 
-export function CreateRole() {
+export function CreateRole(props) {
 
     const [open, setOpen] = React.useState(false);
     const [form, setForm] = React.useState(initialForm);
@@ -36,7 +37,7 @@ export function CreateRole() {
 
     return (
         <div>
-            <IconButton onClick={handleClickOpen}>
+            <IconButton onClick={handleClickOpen} disabled={props.disabled}>
                 <AddIcon />
             </IconButton>
             <Dialog
@@ -68,14 +69,18 @@ export function CreateRole() {
                         </Grid>
 
                         <Grid item xs={12}>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                name="role"
-                                label="Role"
-                                type="email"
-                                fullWidth
-                                variant="outlined"
+                            <ProvidedDataSelection
+                                label={"Access"}
+                                options={[
+                                    { id: "all", access: "All" },
+                                    { id: "write", access: "Write" },
+                                    { id: "read", access: "Read" }
+                                ]}
+                                key_name={"access"}
+                                key_value={"id"}
+                                name={"access"}
+                                selected={form.access}
+                                setForm={setForm}
                             />
                         </Grid>
                     </Grid>

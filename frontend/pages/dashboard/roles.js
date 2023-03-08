@@ -1,15 +1,15 @@
 import * as React from 'react';
 import Router from 'next/router';
 import IconButton from '@mui/material/IconButton';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import nookies from 'nookies';
+import { useSnackbar } from 'notistack';
 import { env } from '@/next.config';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { usePage } from '@/context/Page';
 import { CreateRole } from '@/components/formulary/role/CreateRole';
 import { UpdateRole } from '@/components/formulary/role/UpdateRole';
 import { DeleteRole } from '@/components/formulary/role/DeleteRole';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import { useSnackbar } from 'notistack';
-import { parseCookies } from 'nookies';
 import { axios } from "../../services/api";
 
 export default function Roles(props) {
@@ -58,7 +58,7 @@ export default function Roles(props) {
     }
 
     function handleSelect(e, type, index) {
-        console.log(type);
+        console.log('select');
     }
 
     return (
@@ -67,13 +67,13 @@ export default function Roles(props) {
                 <div className="w-full h-full flex flex-col">
                     <div className="basis-10 grid grid-rows-none grid-cols-table_head">
                         <div>
-                            <CreateRole />
+                            <CreateRole disabled={selections.length > 0} />
                         </div>
                         <div>
-                            <UpdateRole />
+                            <UpdateRole disabled={selections.length > 1 || selections.length === 0} />
                         </div>
                         <div>
-                            <DeleteRole />
+                            <DeleteRole disabled={selections.length === 0} />
                         </div>
                         <div onClick={() => Router.replace(Router.asPath)}>
                             <IconButton>
@@ -90,7 +90,7 @@ export default function Roles(props) {
                                         <tr>
                                             <th scope="col" className="p-4">
                                                 <div className="flex items-center">
-                                                    <input id="checkbox-all-search" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2" onClick={(e) => handleSelect(e, "all", index)} />
+                                                    <input id="checkbox-all-search" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 focus:ring-2" onClick={(e) => handleSelect(e, "all", null)} />
                                                 </div>
                                             </th>
                                             <th scope="col" className="px-6 py-3">
@@ -130,24 +130,27 @@ export async function getServerSideProps(context) {
 
     try {
 
-        const { 'XSRF-TOKEN': csrftoken } = parseCookies(context);
-        if (!csrftoken) {
+        const cookies = nookies.get(context);
+
+        if (!cookies["XSRF-TOKEN"]) {
             throw new Error("Session Token expired!");
         }
 
-        const { 'next.auth': authtoken } = parseCookies(context);
-        if (!authtoken) {
+        if (!cookies["next.auth"]) {
             throw new Error("Authentication Token expired!");
         }
 
-        console.log(headers)
+        const headers = {
+            'X-CSRF-Token': cookies["XSRF-TOKEN"],
+            'Authorization': `Bearer ${cookies["next.auth"]}`
+        };
 
-        /*
-        const response = await axios.get(`${env.API_URL}/api/role`, { headers });
+        const response = await axios.get(`${env.API_URL}/api/role`, headers);
 
-        props.roles = response.data.roles;
-        props.message = response.data.message;
-        */
+        console.log(response)
+
+        //props.roles = response.data.roles;
+        //props.message = response.data.message;
 
     } catch (e) {
         console.log(e);

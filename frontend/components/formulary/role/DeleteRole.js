@@ -28,7 +28,7 @@ export function DeleteRole(props) {
 
     return (
         <div>
-            <IconButton onClick={handleClickOpen}>
+            <IconButton onClick={handleClickOpen} disabled={props.disabled}>
                 <DeleteIcon />
             </IconButton>
             <Dialog
