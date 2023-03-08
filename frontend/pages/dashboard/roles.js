@@ -1,4 +1,5 @@
 import * as React from 'react';
+import dns from 'dns/promises';
 import Router from 'next/router';
 import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -11,11 +12,14 @@ import { CreateRole } from '@/components/formulary/role/CreateRole';
 import { UpdateRole } from '@/components/formulary/role/UpdateRole';
 import { DeleteRole } from '@/components/formulary/role/DeleteRole';
 import { axios } from "../../services/api";
+import { useAuth } from '@/context/Auth';
 
 export default function Roles(props) {
 
     const { setPage } = usePage();
+    const { user } = useAuth();
     const { enqueueSnackbar } = useSnackbar();
+
     const [selections, setSelections] = React.useState([]);
 
     React.useEffect(() => {
@@ -122,6 +126,8 @@ export default function Roles(props) {
 
 export async function getServerSideProps(context) {
 
+    dns.setDefaultResultOrder('ipv4first');
+
     let props = {
         roles: [],
         error: false,
@@ -145,12 +151,14 @@ export async function getServerSideProps(context) {
             'Authorization': `Bearer ${cookies["next.auth"]}`
         };
 
-        const response = await axios.get(`${env.API_URL}/api/role`, headers);
+        const response = await axios.get(`${env.API_URL}/api/role`, headers)
 
-        console.log(response)
+        props.roles = response.data.roles;
+        props.message = response.data.message;
 
-        //props.roles = response.data.roles;
-        //props.message = response.data.message;
+        return {
+            props: props
+        }
 
     } catch (e) {
         console.log(e);
@@ -161,10 +169,10 @@ export async function getServerSideProps(context) {
             props.message = e.message;
         }
 
-    }
+        return {
+            props: props
+        }
 
-    return {
-        props: props,
     }
 
 }

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import dns from 'dns/promises';
 import IconButton from '@mui/material/IconButton';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useSnackbar } from 'notistack';
@@ -11,17 +12,19 @@ import { UpdateUser } from '@/components/formulary/user/UpdateUser';
 import { DeleteUser } from '@/components/formulary/user/DeleteUser';
 import { usePage } from '@/context/Page';
 import { axios } from "../../services/api";
+import { useAuth } from '@/context/Auth';
 
 export default function Users(props) {
 
     const { setPage } = usePage();
+    const { user } = useAuth();
     const { enqueueSnackbar } = useSnackbar();
+
     const [selections, setSelections] = React.useState([]);
 
     React.useEffect(() => {
         setPage("Users");
         enqueueSnackbar(props.message, { variant: props.error ? "error" : "success" });
-
     }, []);
 
     function renderTableRows() {
@@ -123,6 +126,8 @@ export default function Users(props) {
 
 export async function getServerSideProps(context) {
 
+    dns.setDefaultResultOrder('ipv4first');
+
     let props = {
         users: [],
         error: false,
@@ -152,7 +157,7 @@ export async function getServerSideProps(context) {
         props.message = response.data.message;
 
         return {
-            props: props,
+            props: props
         }
 
     } catch (e) {
@@ -165,11 +170,9 @@ export async function getServerSideProps(context) {
         }
 
         return {
-            props: props,
+            props: props
         }
 
     }
-
-
 
 }
